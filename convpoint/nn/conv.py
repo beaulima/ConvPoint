@@ -85,7 +85,11 @@ class PtConv(LayerBase):
         # normalize to unit ball, or not
         if normalize:
             maxi = torch.sqrt((pts.detach()**2).sum(3).max(2)[0]) # detach is a modificaiton
-            maxi[maxi==0] = 1
+            # workaround
+            zeros = torch.zeros_like(maxi)
+            ones = torch.zeros_like(maxi) + 1.0
+            maxi = torch.where(maxi == zeros, ones, maxi)
+            # maxi[maxi == 0] = 1
             pts = pts / maxi.view(maxi.size()+(1,1,))
 
         # compute the distances
